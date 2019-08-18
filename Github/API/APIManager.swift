@@ -15,11 +15,6 @@ class APIManager: NSObject {
         super.init()
     }
     
-    enum APIManagerError: Error {
-        case noUsersFoundError
-        case jsonDecodeError
-    }
-    
     func getUsernames(completion: @escaping ([String]?, Error?) -> Void) {
         let url = URL(string: "https://api.github.com/users")!
         let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
@@ -27,6 +22,10 @@ class APIManager: NSObject {
             do {
                 var usernames: [String] = []
                 let usersJson = try JSONSerialization.jsonObject(with: data, options: []) as? [[String:Any]]
+                if usersJson == nil {
+                    completion(nil, NSError(domain: "com.zykis.Github", code: 3, userInfo: [NSLocalizedDescriptionKey: "API calls exceeds"]))
+                    return
+                }
                 for userJson in usersJson! {
                     if let username = userJson["login"] as? String {
                         usernames.append(username)
@@ -62,6 +61,30 @@ class APIManager: NSObject {
     }
     
     func getStargazedCount(login: String, completion: @escaping (Int?, Error?) -> Void) {
-        
+        let url = URL(string: "https://api.github.com/users/\(login)/repos")!
+        let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
+            guard let data = data else { return }
+            var stargazersCount = 0
+            do {
+                
+                let reposJson: [[String:Any]]? = try JSONSerialization.jsonObject(with: data, options: []) as? [[String:Any]]
+                if reposJson == nil {
+                    completion(nil, NSError(domain: "com.zykis.Github", code: 3, userInfo: [NSLocalizedDescriptionKey: "No repos found for user: \(login)"]))
+                    return
+                }
+                for repoJson in reposJson! {
+                    if let stargazers = repoJson["stargazers_count"] as? Int {
+                        stargazersCount += stargazers
+                    }
+                }
+                completion(stargazersCount, nil)
+            } catch let error as NSError {
+                completion(nil, error)
+            } catch {
+                completion(nil, NSError(domain: "com.zykis.Github", code: 4, userInfo: [NSLocalizedDescriptionKey: "Uknowned error"]))
+            }
+            
+        }
+        task.resume()
     }
 }

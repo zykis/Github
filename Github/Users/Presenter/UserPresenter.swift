@@ -41,6 +41,16 @@ class UserPresenter: NSObject, UserPresenterProtocol {
                         self.users.append(user)
                         self.view?.reloadData()
                     }
+                    
+                    APIManager.shared.getStargazedCount(login: user.username, completion: { (stargezers, error) in
+                        guard stargezers != nil else { return }
+                        if let u = self.users.first(where: { $0.username == user.username }) {
+                            DispatchQueue.main.async {
+                                u.stargazersCount = stargezers!
+                                self.view?.reloadData()
+                            }
+                        }
+                    })
                 })
             }
         })
