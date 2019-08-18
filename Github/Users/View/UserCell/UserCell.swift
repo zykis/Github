@@ -15,8 +15,22 @@ class UserCell: UITableViewCell {
     @IBOutlet weak var avatarImageView: UIImageView?
     @IBOutlet weak var followersLabel: UILabel?
     @IBOutlet weak var starsLabel: UILabel?
+    var profileUrlString: String?
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        let gestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(browse))
+        self.addGestureRecognizer(gestureRecognizer)
+    }
+    
+    @objc func browse() {
+        guard let profileUrlString = self.profileUrlString, let profileUrl = URL(string: profileUrlString) else { return }
+        UIApplication.shared.open(profileUrl, options: [:], completionHandler: nil)
+    }
     
     func update(with user: User) {
+        self.profileUrlString = user.url
+        
         self.usernameLabel?.text = user.username
         self.nameLabel?.text = user.name ?? ""
         self.locationLabel?.text = user.location ?? ""

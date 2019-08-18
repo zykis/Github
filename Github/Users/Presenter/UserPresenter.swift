@@ -32,17 +32,26 @@ class UserPresenter: NSObject, UserPresenterProtocol {
     
     func handleViewDidLoad() {
         APIManager.shared.getUsernames(completion: { (usernames, error) in
+            if let error = error {
+                print(error.localizedDescription)
+            }
             guard let usernames = usernames else { return }
             for username in usernames {
+                
                 APIManager.shared.getUser(login: username, completion: { (user, error) in
+                    if let error = error {
+                        print(error.localizedDescription)
+                    }
                     guard let user = user else { return }
                     DispatchQueue.main.async {
-                        print(user.username)
                         self.users.append(user)
                         self.view?.reloadData()
                     }
                     
                     APIManager.shared.getStargazedCount(login: user.username, completion: { (stargezers, error) in
+                        if let error = error {
+                            print(error.localizedDescription)
+                        }
                         guard stargezers != nil else { return }
                         if let u = self.users.first(where: { $0.username == user.username }) {
                             DispatchQueue.main.async {

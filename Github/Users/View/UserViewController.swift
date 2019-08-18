@@ -10,6 +10,7 @@ import UIKit
 
 let userCellIdentifier = "UserCell"
 let userCellNibName = "UserCell"
+let userCellHeight: CGFloat = 104.0
 
 class UserViewController: UIViewController {
     var presenter: UserPresenter!
@@ -68,6 +69,6 @@ extension UserViewController: UITableViewDataSource {
 
 extension UserViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 104.0
+        return userCellHeight
     }
 }

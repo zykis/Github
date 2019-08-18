@@ -15,6 +15,7 @@ class User: Decodable {
     var name: String?
     var location: String?
     var stargazersCount: Int = 0
+    var url: String?
     
     // Have to manually override because location and name keys could be "null"
     required init(from decoder: Decoder) throws {
@@ -22,6 +23,7 @@ class User: Decodable {
         self.username = try container.decode(String.self, forKey: .username)
         self.avatarUrl = try container.decode(String.self, forKey: .avatarUrl)
         self.followers = try container.decode(Int.self, forKey: .followers)
+        self.url = try container.decode(String.self, forKey: .url)
         self.name = try container.decodeIfPresent(String.self, forKey: .name) ?? nil
         self.location = try container.decodeIfPresent(String.self, forKey: .location) ?? nil
     }
@@ -30,6 +32,7 @@ class User: Decodable {
         case username = "login"
         case avatarUrl = "avatar_url"
         
+        case url
         case followers
         case name
         case location
