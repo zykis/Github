@@ -10,7 +10,7 @@ import Foundation
 
 
 protocol UserViewProtocol: class {
-    func update()
+    func reloadData()
 }
 
 
@@ -31,38 +31,19 @@ class UserPresenter: NSObject, UserPresenterProtocol {
     }
     
     func handleViewDidLoad() {
-        APIManager.shared.getUsers { (data, response, error) in
-            guard let data = data else { return }
-            do {
-                let usersJson = try JSONSerialization.jsonObject(with: data, options: []) as? [[String:Any]]
-                for userJson in usersJson! {
-                    if let username = userJson["login"] as? String {
-                        APIManager.shared.getUser(login: username, completion: { (data, response, error) in
-                            guard let data = data else { return }
-                            
-                            let decoder = JSONDecoder()
-                            do {
-                                let user = try decoder.decode(User.self, from: data)
-                                DispatchQueue.main.async {
-                                    print(user.username)
-                                    self.users.append(user)
-                                    self.view?.update()
-                                }
-                            } catch let decodeError as NSError {
-                                print("\(decodeError.localizedDescription)")
-                                print(String(data: data, encoding: .utf8) ?? "")
-                            } catch {
-                                print("json decode error")
-                            }
-                        })
+        APIManager.shared.getUsernames(completion: { (usernames, error) in
+            guard let usernames = usernames else { return }
+            for username in usernames {
+                APIManager.shared.getUser(login: username, completion: { (user, error) in
+                    guard let user = user else { return }
+                    DispatchQueue.main.async {
+                        print(user.username)
+                        self.users.append(user)
+                        self.view?.reloadData()
                     }
-                }
-            } catch let decodeError as NSError {
-                print("\(decodeError.localizedDescription)")
-            } catch {
-                print("json decode error")
+                })
             }
-        }
+        })
     }
     
     func user(at indexPath: IndexPath) -> User {

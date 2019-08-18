@@ -23,7 +23,7 @@ class UserCell: UITableViewCell {
         self.followersLabel?.text = "Followers: \(user.followers)"
         self.starsLabel?.text = "Stars: \(user.stargazersCount)"
         if self.avatarImageView?.image == nil {
-            self.avatarImageView?.downloadAndSetupImage(with: URL(string: user.avatarUrl), completion: nil)
+            self.avatarImageView?.downloadAndSetupImage(with: URL(string: "\(user.avatarUrl)&size=\(avatarImageView?.bounds.size.width ?? 88)"), completion: nil)
         }
     }
 }

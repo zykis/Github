@@ -9,6 +9,7 @@
 import UIKit
 
 let userCellIdentifier = "UserCell"
+let userCellNibName = "UserCell"
 
 class UserViewController: UIViewController {
     var presenter: UserPresenter!
@@ -31,7 +32,7 @@ class UserViewController: UIViewController {
     }
     
     private func setupTableView() {
-        self.tableView?.register(UINib(nibName: "UserCell", bundle: nil), forCellReuseIdentifier: userCellIdentifier)
+        self.tableView?.register(UINib(nibName: userCellNibName, bundle: nil), forCellReuseIdentifier: userCellIdentifier)
         self.tableView?.dataSource = self
         self.tableView?.delegate = self
     }
@@ -39,7 +40,7 @@ class UserViewController: UIViewController {
 
 
 extension UserViewController: UserViewProtocol {
-    func update() {
+    func reloadData() {
         self.tableView?.reloadData()
     }
 }
